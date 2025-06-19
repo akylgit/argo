@@ -1,0 +1,30 @@
+name: Build and Deploy to Argo CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Log in to DockerHub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+    - name: Build Docker Image
+      run: docker build -t akyldocker25/nginx-argo:latest .
+
+    - name: Push Docker Image
+      run: docker push akyldocker25/nginx-argo:latest
+
+    - name: Commit updated manifests (optional)
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git add k8s/
+        git commit -m "Updated manifest with new image" || echo "No changes"
+        git push
