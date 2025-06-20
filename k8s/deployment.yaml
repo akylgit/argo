@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: akyldocker25/nginx-argo:d44da0d
+        image: akyldocker25/nginx-argo:603007e
         ports:
         - containerPort: 80
 ---
