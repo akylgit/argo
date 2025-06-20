@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nginx-app
+  namespace: default          # <--- add this line
   labels:
     app: nginx-app
 spec:
@@ -16,7 +17,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: akyldocker25/nginx-argo:latest
+        image: akyldocker25/nginx-argo:d44da0d
         ports:
         - containerPort: 80
 ---
@@ -24,6 +25,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: nginx-app
+  namespace: default          # <--- add this line
 spec:
   selector:
     app: nginx-app
