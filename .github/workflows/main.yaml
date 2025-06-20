@@ -1,4 +1,4 @@
-name: Build, Push & Update Deployment
+name: Build, Push & Update Deployment to v4
 
 on:
   push:
@@ -12,29 +12,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set image tag from commit SHA
-        id: vars
-        run: echo "IMAGE_TAG=v${GITHUB_SHA::7}" >> $GITHUB_ENV
-
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      - name: Build Docker image
-        run: docker build -t akyldocker25/nginx-argo:$IMAGE_TAG .
+      - name: Build Docker image v4
+        run: docker build -t akyldocker25/argo-nginx:v4 .
 
-      - name: Push Docker image
-        run: docker push akyldocker25/nginx-argo:$IMAGE_TAG
+      - name: Push Docker image v4
+        run: docker push akyldocker25/argo-nginx:v4
 
       - name: Update image tag in deployment.yaml
         run: |
-          sed -i "s|image: akyldocker25/nginx-argo:.*|image: akyldocker25/nginx-argo:$IMAGE_TAG|" k8s/deployment.yaml
+          sed -i "s|image: akyldocker25/argo-nginx:.*|image: akyldocker25/argo-nginx:v4|" k8s/deployment.yaml
 
       - name: Commit and push deployment.yaml update
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add k8s/deployment.yaml
-          git diff --cached --quiet || git commit -m "Update image to $IMAGE_TAG"
+          git diff --cached --quiet || git commit -m "Update image to v4"
           git push origin main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
